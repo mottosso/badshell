@@ -13,6 +13,7 @@ import subprocess
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("shell", default="cmd")
+    parser.add_argument("--method", default="subprocess1")
     parser.add_argument("--command")
     opts = parser.parse_args()
 
@@ -38,13 +39,23 @@ def main():
         )
 
     print("Calling '%s'" % " ".join(args))
-    popen = subprocess.Popen(
-        args,
-        env=env,
-        universal_newlines=True,
-    )
 
-    exit(popen.wait())
+    if opts.method == "subprocess1":
+        popen = subprocess.Popen(
+            args,
+            env=env,
+        )
+
+        exit(popen.wait())
+
+    elif opts.method == "execve":
+        os.execve(args[0], args[1:], env)
+
+    else:
+        raise ValueError(
+            "'%s' not one of the supported methods (%s)"
+            % ", ".join(["subprocess1", "execve"])
+        )
 
 
 if __name__ == '__main__':
